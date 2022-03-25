@@ -18,6 +18,16 @@ resource "aws_vpc_endpoint" "gwlb_endpoint" {
   vpc_endpoint_type  = aws_vpc_endpoint_service.gwlb_endpoint_service.service_type
   vpc_id             = aws_vpc.vpc_egress.id
   tags = {
-    name =  "gwlb_endpoint"
+    Name =  "${local.name_prefix}-gwlb_endpoint"
+  }
+}
+
+resource "aws_vpc_endpoint" "onprem_endpoint" {
+  service_name       = aws_vpc_endpoint_service.gwlb_endpoint_service.service_name
+  subnet_ids         = ["${aws_subnet.public_subnets_onprem_endpoint.id}"]
+  vpc_endpoint_type  = aws_vpc_endpoint_service.gwlb_endpoint_service.service_type
+  vpc_id             = aws_vpc.vpc_onprem.id
+  tags = {
+    Name =  "${local.name_prefix}-onprem-endpoint"
   }
 }

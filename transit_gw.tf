@@ -21,46 +21,8 @@ resource "aws_ec2_transit_gateway_route_table" "rtb_hub" {
   }
 }
 
-resource "aws_ec2_transit_gateway_route_table_association" "rt_ass_spoke_1" {
-  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.spoke_1_tgw.id
-  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.rtb_spoke.id
-}
-
-resource "aws_ec2_transit_gateway_route_table_association" "rt_ass_spoke_2" {
-  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.spoke_2_tgw.id
-  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.rtb_spoke.id
-}
-
-resource "aws_ec2_transit_gateway_route_table_association" "rt_ass_onprem" {
-  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.onprem_tgw.id
-  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.rtb_spoke.id
-}
-
-resource "aws_ec2_transit_gateway_route_table_propagation" "rt_prop_egress" {
-  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.egress_tgw.id
-  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.rtb_spoke.id
-}
-
-resource "aws_ec2_transit_gateway_route_table_association" "rt_ass_egress" {
-  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.egress_tgw.id
-  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.rtb_hub.id
-}
-
-resource "aws_ec2_transit_gateway_route_table_propagation" "rt_prop_spoke_1" {
-  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.spoke_1_tgw.id
-  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.rtb_hub.id
-}
-
-resource "aws_ec2_transit_gateway_route_table_propagation" "rt_prop_spoke_2" {
-  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.spoke_2_tgw.id
-  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.rtb_hub.id
-}
-
-resource "aws_ec2_transit_gateway_route_table_propagation" "rt_prop_onprem" {
-  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.onprem_tgw.id
-  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.rtb_hub.id
-}
-
+###############################################################################################
+#Create tgw attachment
 resource "aws_ec2_transit_gateway_vpc_attachment" "spoke_1_tgw" {
   subnet_ids         = [aws_subnet.private_subnets_spoke1.id]
   transit_gateway_default_route_table_association = false
@@ -104,6 +66,58 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "egress_tgw" {
     Name             = "${local.name_prefix}-${lookup(var.vpc_egress,"name")}-tgw"
   }
 }
+
+#########################################################################################
+#Configure route table spoke
+resource "aws_ec2_transit_gateway_route_table_association" "rt_ass_spoke_1" {
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.spoke_1_tgw.id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.rtb_spoke.id
+}
+
+resource "aws_ec2_transit_gateway_route_table_association" "rt_ass_spoke_2" {
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.spoke_2_tgw.id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.rtb_spoke.id
+}
+
+resource "aws_ec2_transit_gateway_route_table_association" "rt_ass_onprem" {
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.onprem_tgw.id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.rtb_spoke.id
+}
+
+resource "aws_ec2_transit_gateway_route_table_propagation" "rt_prop_egress" {
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.egress_tgw.id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.rtb_spoke.id
+}
+
+resource "aws_ec2_transit_gateway_route" "rtb_spoke_static_route" {
+  destination_cidr_block         = "0.0.0.0/0"
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.egress_tgw.id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.rtb_spoke.id
+}
+
+#################################################################################################
+#Configure route table hub
+resource "aws_ec2_transit_gateway_route_table_association" "rt_ass_egress" {
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.egress_tgw.id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.rtb_hub.id
+}
+
+resource "aws_ec2_transit_gateway_route_table_propagation" "rt_prop_spoke_1" {
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.spoke_1_tgw.id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.rtb_hub.id
+}
+
+resource "aws_ec2_transit_gateway_route_table_propagation" "rt_prop_spoke_2" {
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.spoke_2_tgw.id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.rtb_hub.id
+}
+
+resource "aws_ec2_transit_gateway_route_table_propagation" "rt_prop_onprem" {
+  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.onprem_tgw.id
+  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.rtb_hub.id
+}
+
+
 
 
 

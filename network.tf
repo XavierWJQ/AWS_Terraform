@@ -54,6 +54,21 @@ resource "aws_eip" "eip_nat_egress" {
   }
 }
 
+resource "aws_eip" "forigate_eip_untrust" {
+  vpc      = true
+  network_interface         = aws_network_interface.eth0_fortigate.id
+  tags = {
+    Name = "${local.name_prefix}-eip_untrust"
+  }
+}
+
+resource "aws_eip" "forigate_eip_trust" {
+  vpc      = true
+  network_interface         = aws_network_interface.eth1_fortigate.id
+  tags = {
+    Name = "${local.name_prefix}_eip_trust"
+  }
+}
 
 resource "aws_nat_gateway" "nat_egress" {
   subnet_id     = "${aws_subnet.public_subnets_egress_NATGW_subnet.id}"
@@ -94,6 +109,15 @@ resource "aws_subnet" "public_subnets_onprem" {
     cidr_block             = "${lookup(var.public_subnets_onprem,"cidr")}"
     tags                   = {
         Name = "${local.name_prefix}-${lookup(var.public_subnets_onprem,"name")}"
+    }
+}
+
+resource "aws_subnet" "public_subnets_onprem_endpoint" {
+    vpc_id                 = aws_vpc.vpc_onprem.id
+    availability_zone      = var.aws_availability_zones
+    cidr_block             = "${lookup(var.public_subnets_onprem_endpoint,"cidr")}"
+    tags                   = {
+        Name = "${local.name_prefix}-${lookup(var.public_subnets_onprem_endpoint,"name")}"
     }
 }
 

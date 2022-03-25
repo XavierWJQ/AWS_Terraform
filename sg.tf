@@ -36,6 +36,9 @@ resource "aws_default_security_group" "spoke_1" {
         protocol    = "-1"
         cidr_blocks = ["0.0.0.0/0"]
     }
+    tags = {
+        Name = "SG-default-spoke1"
+    }
 }
 
 resource "aws_default_security_group" "spoke_2" {
@@ -74,7 +77,11 @@ resource "aws_default_security_group" "spoke_2" {
         protocol    = "-1"
         cidr_blocks = ["0.0.0.0/0"]
     }
+    tags = {
+        Name = "SG-default-spoke2"
+    }
 }
+
 
 resource "aws_default_security_group" "onprem" {
     vpc_id = aws_vpc.vpc_onprem.id
@@ -112,7 +119,11 @@ resource "aws_default_security_group" "onprem" {
         protocol    = "-1"
         cidr_blocks = ["0.0.0.0/0"]
     }
+    tags = {
+        Name = "SG-default-onprem"
+    }
 }
+
 
 
 resource "aws_default_security_group" "Egress" {
@@ -145,11 +156,21 @@ resource "aws_default_security_group" "Egress" {
         protocol    = "icmp"
         cidr_blocks = ["0.0.0.0/0"]
     }
+    ingress {
+        description = "GENEVE"
+        from_port   = 6081
+        to_port     = 6081
+        protocol    = "udp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }  
     egress {
         from_port   = 0
         to_port     = 0
         protocol    = "-1"
         cidr_blocks = ["0.0.0.0/0"]
+    }
+    tags = {
+        Name = "SG-default-Egress"
     }
 }
 
@@ -177,7 +198,7 @@ resource "aws_security_group" "SG_mgmt_tgw" {
         to_port     = 22
         protocol    = "tcp"
         cidr_blocks = ["192.168.10.0/26"]
-    }
+    } 
     egress {
         from_port   = 0
         to_port     = 0
@@ -185,7 +206,7 @@ resource "aws_security_group" "SG_mgmt_tgw" {
         cidr_blocks = ["0.0.0.0/0"]
     }
     tags = {
-        name = "SG-mgmt-tgw"
+        Name = "SG-mgmt-tgw"
     }
 }
 
@@ -193,13 +214,6 @@ resource "aws_security_group" "SG_mgmt_tgw" {
 resource "aws_security_group" "SG_data" {
   name =  "SG-data-egress"
   vpc_id = aws_vpc.vpc_egress.id
-    ingress {
-        description = "GENEVE"
-        from_port   = 6081
-        to_port     = 6081
-        protocol    = "udp"
-        cidr_blocks = "${aws_vpc_endpoint.gwlb_endpoint.cidr_blocks}"
-    }
     ingress {
         description = "allow traffic from health check of tg with protocol tcp"
         from_port   = 80
@@ -214,7 +228,28 @@ resource "aws_security_group" "SG_data" {
         cidr_blocks = ["0.0.0.0/0"]
     }
     tags = {
-        name = "SG-data"
+        Name = "SG-data"
+    }
+}
+
+#Create SG for Untrust
+resource "aws_security_group" "SG_Untrust" {
+  name =  "SG-untrust"
+  vpc_id = aws_vpc.vpc_egress.id
+    ingress {
+        from_port   = 0
+        to_port     = 0
+        protocol    = "-1"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+    egress {
+        from_port   = 0
+        to_port     = 0
+        protocol    = "-1"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+    tags = {
+        Name = "SG-untrust"
     }
 }
 
