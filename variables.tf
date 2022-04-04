@@ -63,6 +63,14 @@ variable "private_subnets_spoke1" {
     }
 }
 
+variable "public_subnets_spoke1" {
+    type = map
+    default = {
+        name = "private-subnet-spoke-1"
+        cidr = "192.168.3.64/28"
+    }
+}
+
 variable "private_subnets_spoke2" {
     type         = map
     default      = {
@@ -143,18 +151,27 @@ variable "image_fortigate" {
 
 variable "eth0_fortigate" {
     type = string
-    default = "192.168.2.93/32"
+    default = "192.168.2.93"
+}
+
+variable "eip_eth0_fortigate" {
+    type = string
+    default = "50.16.29.214"
 }
 
 variable "eth1_fortigate" {
     type = string
-    default = "192.168.2.18/32"
-  
+    default = "192.168.2.18"
+}
+
+variable "eip_eth1_fortigate" {
+    type = string
+    default = "52.4.110.136"
 }
 
 variable "eth0_spoke1" {
     type = string
-    default = "192.168.3.23/32"
+    default = "192.168.3.23"
 }
 
 variable "default_route_table_association" {
