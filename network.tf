@@ -47,6 +47,14 @@ resource "aws_internet_gateway" "igw_onprem" {
     }
 }
 
+resource "aws_internet_gateway" "igw_spoke1" {
+    vpc_id = aws_vpc.vpc_spoke1.id
+    tags = {
+        Name = "spoke1-igw"
+    }
+}
+
+
 resource "aws_eip" "eip_nat_egress" {
   vpc      = true
   tags = {
@@ -58,7 +66,7 @@ resource "aws_eip" "forigate_eip_untrust" {
   vpc      = true
   network_interface         = aws_network_interface.eth0_fortigate.id
   tags = {
-    Name = "${local.name_prefix}-eip_untrust"
+    Name = "Fortifw1-NAT"
   }
 }
 
@@ -66,7 +74,7 @@ resource "aws_eip" "forigate_eip_trust" {
   vpc      = true
   network_interface         = aws_network_interface.eth1_fortigate.id
   tags = {
-    Name = "${local.name_prefix}_eip_trust"
+    Name = "Fortifw-data"
   }
 }
 
@@ -94,6 +102,15 @@ resource "aws_subnet" "private_subnets_spoke1" {
     }
 }
 
+resource "aws_subnet" "public_subnets_spoke1" {
+    vpc_id                 = aws_vpc.vpc_spoke1.id
+    availability_zone      = var.aws_availability_zones
+    cidr_block             = "${lookup(var.public_subnets_spoke1,"cidr")}"
+    tags                   = {
+        Name = "sbn-spoke1-ep"
+    }
+}
+
 resource "aws_subnet" "private_subnets_spoke2" {
     vpc_id                 = aws_vpc.vpc_spoke2.id
     availability_zone      = var.aws_availability_zones
@@ -117,7 +134,7 @@ resource "aws_subnet" "public_subnets_onprem_endpoint" {
     availability_zone      = var.aws_availability_zones
     cidr_block             = "${lookup(var.public_subnets_onprem_endpoint,"cidr")}"
     tags                   = {
-        Name = "${local.name_prefix}-${lookup(var.public_subnets_onprem_endpoint,"name")}"
+        Name = "onprem-endp"
     }
 }
 

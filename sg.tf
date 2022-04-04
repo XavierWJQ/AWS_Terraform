@@ -162,7 +162,14 @@ resource "aws_default_security_group" "Egress" {
         to_port     = 6081
         protocol    = "udp"
         cidr_blocks = ["0.0.0.0/0"]
-    }  
+    }
+    ingress {
+        description = "all tcp"
+        from_port   = -1
+        to_port     = -1
+        protocol    = "tcp"
+        cidr_blocks = ["0.0.0.0/0"]
+    }    
     egress {
         from_port   = 0
         to_port     = 0

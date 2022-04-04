@@ -1,4 +1,4 @@
-resource "aws_codebuild_project" "BB-plan" {
+/* resource "aws_codebuild_project" "BB-plan" {
   name          = "BB-cicd-plan"
   description   = "Plan stage for terraform"
   service_role  = aws_iam_role.BB_codebuild_role.arn
@@ -146,4 +146,4 @@ resource "aws_codepipeline" "cicd_pipeline" {
             }
         }
     }
-}
+} */

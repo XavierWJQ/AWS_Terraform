@@ -22,12 +22,13 @@ resource "aws_vpc_endpoint" "gwlb_endpoint" {
   }
 }
 
-resource "aws_vpc_endpoint" "onprem_endpoint" {
+
+resource "aws_vpc_endpoint" "spoke1_endpoint" {
   service_name       = aws_vpc_endpoint_service.gwlb_endpoint_service.service_name
-  subnet_ids         = ["${aws_subnet.public_subnets_onprem_endpoint.id}"]
+  subnet_ids         = ["${aws_subnet.public_subnets_spoke1.id}"]
   vpc_endpoint_type  = aws_vpc_endpoint_service.gwlb_endpoint_service.service_type
-  vpc_id             = aws_vpc.vpc_onprem.id
+  vpc_id             = aws_vpc.vpc_spoke1.id
   tags = {
-    Name =  "${local.name_prefix}-onprem-endpoint"
+    Name =  "spoke1-ep"
   }
 }

@@ -1,4 +1,4 @@
-resource "aws_iam_role" "BB_codepipeline_role" {
+/* resource "aws_iam_role" "BB_codepipeline_role" {
   name = "BB_codepipeline_role"
 
   assume_role_policy = <<EOF
@@ -86,3 +86,4 @@ resource "aws_iam_role_policy_attachment" "BB_cicd_codebuild_attachment" {
     policy_arn  = aws_iam_policy.BB_cicd_build_policy.arn
     role        = aws_iam_role.BB_codebuild_role.id
 }
+ */
